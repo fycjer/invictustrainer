@@ -1,5 +1,4 @@
-/* INVICTUS TRAINER - CSS externo
-   Diseño y estilos visuales. */
+/* INVICTUS TRAINER - CSS externo */
 
 * {
             font-family: 'Rajdhani', sans-serif;
@@ -241,3 +240,16 @@
             background: linear-gradient(145deg, rgba(14, 165, 233, 0.3), rgba(15, 23, 42, 0.95)) !important;
             box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), inset 0 0 10px rgba(56, 189, 248, 0.3) !important;
         }
+
+/* Hotkey knowledge carousel */
+.hotkey-carousel-shell { position: relative; width: 100%; }
+.hotkey-carousel-viewport { overflow: hidden; width: 100%; border-radius: 14px; }
+.hotkey-carousel-track { display: flex; width: 100%; transition: transform 0.3s ease; touch-action: pan-y; }
+.hotkey-carousel-page { min-width: 100%; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(112px, auto)); gap: 10px; padding: 2px 42px; box-sizing: border-box; }
+.hotkey-carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; width: 34px; height: 34px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #e2e8f0; background: rgba(15, 23, 42, 0.96); border: 1px solid rgba(56, 189, 248, 0.45); box-shadow: 0 8px 20px rgba(0,0,0,.3); transition: .2s ease; cursor: pointer; }
+.hotkey-carousel-arrow:hover:not(:disabled) { color: #38bdf8; border-color: #38bdf8; transform: translateY(-50%) scale(1.06); }
+.hotkey-carousel-arrow:disabled { opacity: .25; cursor: not-allowed; }
+.hotkey-carousel-arrow-left { left: 2px; }
+.hotkey-carousel-arrow-right { right: 2px; }
+@media (max-width: 767px) { .hotkey-carousel-page { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(112px, auto)); padding: 2px 36px; } }
+@media (max-width: 480px) { .hotkey-carousel-page { gap: 7px; padding-left: 34px; padding-right: 34px; } .hotkey-carousel-arrow { width: 30px; height: 30px; } }

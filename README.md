@@ -1,13 +1,10 @@
 # INVICTUS Trainer
 
-## Estructura
+- `index.html`: estructura y contenido.
+- `css/styles.css`: estilos.
+- `js/app.js`: lógica, eventos, audio, ranking y estado.
 
-- `index.html` → estructura y contenido de la página.
-- `css/styles.css` → estilos personalizados.
-- `js/app.js` → lógica del juego, eventos, audio, ranking y estado.
-
-Las dependencias externas actuales (Tailwind CDN, FontAwesome y Google Fonts) se mantienen sin cambios.
-
-## Publicación en GitHub Pages
-
-Sube el contenido de esta carpeta al repositorio y configura GitHub Pages para servir desde la rama/carpeta correspondiente.
+### Nuevo flujo de teclas rápidas
+1. Se pregunta si el operador conoce las teclas rápidas.
+2. **Sí** desplaza hasta la selección de juego.
+3. **No** abre un visor 3x2 con 6 comandos por página y navegación izquierda/derecha para consultar los 18.

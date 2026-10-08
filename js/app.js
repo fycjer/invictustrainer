@@ -1,6 +1,4 @@
-/* INVICTUS TRAINER - JavaScript externo
-   Lógica del juego, eventos, audio, ranking y estado.
-*/
+/* INVICTUS TRAINER - JavaScript externo */
 
 /* ==========================================================================
            1. INVICTUS 18 HOTKEYS MASTER DATA DEFINITION
@@ -34,28 +32,28 @@
                 level: 1,
                 title: "Básicas y Navegación",
                 desc: "4 Comandos iniciales de navegación básica.",
-                timeoutMs: 4500,
+                timeoutMs: 3500,
                 keys: [6, 10, 8, 9] // TAB, Flechas, T, C
             },
             {
                 level: 2,
                 title: "Teclas de Función Directas",
                 desc: "5 Comandos mediante teclas de función F1 a F9.",
-                timeoutMs: 4000,
+                timeoutMs: 3000,
                 keys: [15, 16, 2, 3, 4] // F1, F2, F3, F7, F9
             },
             {
                 level: 3,
                 title: "Acciones Avanzadas",
                 desc: "5 Comandos avanzadas de carrito, aleatorios y selección.",
-                timeoutMs: 3500,
+                timeoutMs: 2500,
                 keys: [17, 5, 13, 11, 12] // F10, F11, H, *, -
             },
             {
                 level: 4,
                 title: "Operaciones Críticas",
                 desc: "4 Comandos críticos como pago, salida y borrado.",
-                timeoutMs: 3000,
+                timeoutMs: 2000,
                 keys: [1, 7, 18, 14] // ESC, PageUp, Supr, Ctrl+Enter
             }
         ];
@@ -1266,16 +1264,97 @@
             `;
         }
 
+        let hotkeyCarouselPage = 0;
+
+        function renderHotkeyCarousel() {
+            const track = document.getElementById('hotkeyCarouselTrack');
+            const indicator = document.getElementById('hotkeyPageIndicator');
+            const prev = document.getElementById('btnHotkeyPrev');
+            const next = document.getElementById('btnHotkeyNext');
+            if (!track) return;
+
+            const pageSize = 6;
+            const pages = [];
+            for (let i = 0; i < INVICTUS_KEYS.length; i += pageSize) {
+                pages.push(INVICTUS_KEYS.slice(i, i + pageSize));
+            }
+
+            track.innerHTML = pages.map(page => `
+                <div class="hotkey-carousel-page">
+                    ${page.map(k => renderKeycardHTML(k)).join('')}
+                </div>
+            `).join('');
+
+            hotkeyCarouselPage = Math.max(0, Math.min(hotkeyCarouselPage, pages.length - 1));
+            track.style.transform = `translateX(-${hotkeyCarouselPage * 100}%)`;
+            if (indicator) indicator.textContent = `${hotkeyCarouselPage + 1} / ${pages.length}`;
+            if (prev) prev.disabled = hotkeyCarouselPage === 0;
+            if (next) next.disabled = hotkeyCarouselPage === pages.length - 1;
+        }
+
+        function moveHotkeyCarousel(direction) {
+            const totalPages = Math.ceil(INVICTUS_KEYS.length / 6);
+            hotkeyCarouselPage = Math.max(0, Math.min(hotkeyCarouselPage + direction, totalPages - 1));
+            renderHotkeyCarousel();
+            if (audio) audio.playClick();
+        }
+
+        function scrollToGamePlaySection() {
+            const section = document.getElementById('gamePlaySection');
+            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function setupHotkeyKnowledgeCheck() {
+            const yesBtn = document.getElementById('btnHotkeysYes');
+            const noBtn = document.getElementById('btnHotkeysNo');
+            const viewer = document.getElementById('hotkeyViewer');
+            const prev = document.getElementById('btnHotkeyPrev');
+            const next = document.getElementById('btnHotkeyNext');
+            const continueBtn = document.getElementById('btnContinueFromHotkeys');
+            const track = document.getElementById('hotkeyCarouselTrack');
+
+            if (yesBtn) {
+                yesBtn.addEventListener('click', () => {
+                    if (audio) audio.playClick();
+                    scrollToGamePlaySection();
+                });
+            }
+
+            if (noBtn) {
+                noBtn.addEventListener('click', () => {
+                    if (audio) audio.playClick();
+                    if (viewer) viewer.classList.remove('hidden');
+                    hotkeyCarouselPage = 0;
+                    renderHotkeyCarousel();
+                });
+            }
+
+            if (prev) prev.addEventListener('click', () => moveHotkeyCarousel(-1));
+            if (next) next.addEventListener('click', () => moveHotkeyCarousel(1));
+            if (continueBtn) continueBtn.addEventListener('click', scrollToGamePlaySection);
+
+            // Touch / mouse swipe support for moving the 3x2 panels left and right.
+            if (track) {
+                let startX = null;
+                track.addEventListener('pointerdown', e => { startX = e.clientX; });
+                track.addEventListener('pointerup', e => {
+                    if (startX === null) return;
+                    const delta = e.clientX - startX;
+                    if (Math.abs(delta) > 45) moveHotkeyCarousel(delta < 0 ? 1 : -1);
+                    startX = null;
+                });
+                track.addEventListener('pointercancel', () => { startX = null; });
+            }
+        }
+
         function populateGuideTable() {
-            const mainGrid = document.getElementById('mainScreenKeysGrid');
             const modalContainer = document.getElementById('guideKeysContainer');
 
-            if (mainGrid) {
-                mainGrid.innerHTML = INVICTUS_KEYS.map(k => renderKeycardHTML(k)).join('');
-            }
             if (modalContainer) {
                 modalContainer.innerHTML = INVICTUS_KEYS.map(k => renderKeycardHTML(k)).join('');
             }
+
+            renderHotkeyCarousel();
 
             // Attach interactive hover sound
             document.querySelectorAll('.hotkey-interactive-card').forEach(card => {
@@ -1351,6 +1430,9 @@
             populateGuideTable();
             guideModal.classList.remove('hidden');
         });
+
+        // Hotkey knowledge check: wire the YES/NO buttons on page load.
+        setupHotkeyKnowledgeCheck();
         document.getElementById('closeGuideModalBtn').addEventListener('click', () => guideModal.classList.add('hidden'));
         document.getElementById('closeGuideModalFooterBtn').addEventListener('click', () => guideModal.classList.add('hidden'));
 
@@ -1379,9 +1461,9 @@
         if (savedPlayer) {
             syncOperatorDisplays(savedPlayer, savedAvatar);
             closeOperatorModal();
-        } else {
-            openOperatorModal();
         }
+        // La identificación del operador se solicita al intentar iniciar una partida,
+        // no al cargar el menú, para permitir primero responder la pregunta de teclas.
 
         // Ranking Modal Events
         const rankingModal = document.getElementById('rankingModal');
