@@ -1,0 +1,243 @@
+/* INVICTUS TRAINER - CSS externo
+   Diseño y estilos visuales. */
+
+* {
+            font-family: 'Rajdhani', sans-serif;
+            user-select: none;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+
+        /* Invictus Neon Glow Effects */
+        .neon-blue {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.7), 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+        .neon-box-blue {
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.35), inset 0 0 15px rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+        }
+        .neon-box-emerald {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35), inset 0 0 15px rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+
+        /* Key Cap Styling */
+        .key-cap {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            box-shadow: 0 6px 0 #020617, 0 10px 15px rgba(0,0,0,0.5);
+            transition: transform 0.05s ease, box-shadow 0.05s ease;
+        }
+        .key-cap.active-press {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #020617, 0 0 20px rgba(56, 189, 248, 0.8);
+            border-color: #38bdf8;
+        }
+
+        /* Radial Timer Ring */
+        .timer-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .timer-circle {
+            stroke-dasharray: 502; /* 2 * PI * 80 */
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.05s linear;
+        }
+
+        /* Screen Shake FX on Miss */
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-10px, 6px); }
+            40% { transform: translate(10px, -6px); }
+            60% { transform: translate(-6px, -3px); }
+            80% { transform: translate(6px, 3px); }
+        }
+        .shake-fx {
+            animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Success Pulse FX */
+        @keyframes pulseSuccess {
+            0% { background-color: rgba(16, 185, 129, 0.2); }
+            100% { background-color: transparent; }
+        }
+        .pulse-success-fx {
+            animation: pulseSuccess 0.4s ease-out;
+        }
+
+        /* Rating Float Popup */
+        @keyframes floatUp {
+            0% { opacity: 0; transform: scale(0.5) translateY(20px); }
+            25% { opacity: 1; transform: scale(1.25) translateY(-10px); }
+            70% { opacity: 1; transform: scale(1) translateY(-25px); }
+            100% { opacity: 0; transform: scale(0.8) translateY(-40px); }
+        }
+        .rating-popup {
+            animation: floatUp 0.75s forwards ease-out;
+        }
+
+        /* 3D Mechanical Keyboard Keycap Styling */
+        .keycap-socket {
+            background: rgba(10, 15, 29, 0.85);
+            border-radius: 9px;
+            padding: 4px 6px;
+            border: 1px solid rgba(51, 65, 85, 0.6);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .mech-keycap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.28rem 0.55rem;
+            min-width: 1.85rem;
+            height: 1.85rem;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            background: linear-gradient(180deg, #334155 0%, #1e293b 65%, #0f172a 100%);
+            border: 1px solid #475569;
+            border-bottom: 4px solid #020617;
+            border-radius: 6px;
+            box-shadow: 0 4px 5px -1px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            transform: translateY(0);
+            transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.4, 1.2),
+                        border-bottom-width 0.12s ease,
+                        box-shadow 0.15s ease,
+                        background 0.2s ease,
+                        color 0.15s ease;
+        }
+
+        /* Subtle switch indicator inside the key */
+        .mech-keycap::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            right: 4px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        /* Physical Key Press Animation on Card Hover */
+        .hotkey-interactive-card:hover .mech-keycap {
+            transform: translateY(3px);
+            border-bottom-width: 1px;
+            background: linear-gradient(180deg, #0284c7 0%, #0369a1 70%, #075985 100%);
+            border-color: #38bdf8;
+            color: #ffffff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), 
+                        0 0 15px rgba(56, 189, 248, 0.8), 
+                        inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            animation: keypressSpring 0.35s cubic-bezier(0.25, 1.5, 0.5, 1);
+        }
+
+        .hotkey-interactive-card:hover .keycap-socket {
+            border-color: rgba(56, 189, 248, 0.5);
+            background: rgba(14, 165, 233, 0.12);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 12px rgba(14, 165, 233, 0.3);
+        }
+
+        @keyframes keypressSpring {
+            0% { transform: translateY(0); border-bottom-width: 4px; }
+            45% { transform: translateY(4px); border-bottom-width: 1px; }
+            75% { transform: translateY(2px); border-bottom-width: 2px; }
+            100% { transform: translateY(3px); border-bottom-width: 1px; }
+        }
+
+        /* Interactive Hotkey Card Hover Animation & Color Transitions */
+        .hotkey-interactive-card {
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+        }
+
+        .hotkey-interactive-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.15), transparent);
+            transition: left 0.6s ease;
+            pointer-events: none;
+        }
+
+        .hotkey-interactive-card:hover {
+            transform: translateY(-6px) scale(1.025);
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+            border-color: #38bdf8 !important;
+            box-shadow: 0 12px 28px -4px rgba(14, 165, 233, 0.4), 
+                        0 0 18px rgba(56, 189, 248, 0.3), 
+                        inset 0 0 14px rgba(56, 189, 248, 0.15);
+        }
+
+        .hotkey-interactive-card:hover::before {
+            left: 100%;
+        }
+
+        .hotkey-interactive-card:hover .key-title-text {
+            color: #ffffff !important;
+            text-shadow: 0 0 12px rgba(56, 189, 248, 0.9), 0 0 24px rgba(14, 165, 233, 0.6);
+            transform: scale(1.04);
+        }
+
+        .hotkey-interactive-card:hover .key-badge-num {
+            background-color: #0284c7 !important;
+            color: #ffffff !important;
+            border-color: #38bdf8 !important;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+        }
+
+        .hotkey-interactive-card:hover .key-action-desc {
+            color: #ffffff !important;
+        }
+
+        .bg-cyber-grid {
+            background-size: 36px 36px;
+            background-image: 
+                linear-gradient(to right, rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+        }
+
+        /* 3D Human Avatar Character Styling */
+        .avatar-3d-card {
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .avatar-3d-card:hover {
+            transform: translateY(-4px) scale(1.05);
+        }
+        .avatar-3d-card.avatar-selected {
+            border-color: #38bdf8 !important;
+            background: linear-gradient(145deg, rgba(14, 165, 233, 0.3), rgba(15, 23, 42, 0.95)) !important;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), inset 0 0 10px rgba(56, 189, 248, 0.3) !important;
+        }
