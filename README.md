@@ -1,10 +1,9 @@
-# INVICTUS Trainer
+# INVICTUS TRAINER
 
-- `index.html`: estructura y contenido.
-- `css/styles.css`: estilos.
-- `js/app.js`: lógica, eventos, audio, ranking y estado.
+Juego original con guardado central en Google Apps Script + Google Sheets.
 
-### Nuevo flujo de teclas rápidas
-1. Se pregunta si el operador conoce las teclas rápidas.
-2. **Sí** desplaza hasta la selección de juego.
-3. **No** abre un visor 3x2 con 6 comandos por página y navegación izquierda/derecha para consultar los 18.
+Lee **LEEME-CONEXION-GOOGLE.md**: ejecuta el instalador, publica el script y pega la URL /exec en `config.js`. Sin esa configuración las partidas quedan en una cola local pendiente de sincronización.
+
+Se pide la cédula en cada visita para recuperar perfil, avatar e historial. Se conservan los estilos y reglas originales. Google Sheets almacena todas las partidas finalizadas y permite descargar el informe como Excel; la web comparte las 20 mejores.
+
+Pruebas: `node tests/storage.test.cjs`.

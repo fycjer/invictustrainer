@@ -477,7 +477,7 @@
 
     <!-- MANDATORY POPUP: REGISTRO PREVIO DEL OPERADOR -->
     <div id="operatorRegistrationModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-sky-500/60 rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-sky-500/60 rounded-3xl w-full max-w-lg max-h-[94vh] overflow-y-auto p-6 sm:p-7 shadow-2xl relative">
             <!-- Ambient Glow -->
             <div class="absolute -top-16 -right-16 w-36 h-36 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -493,12 +493,20 @@
                 </div>
 
                 <h3 class="font-orbitron font-extrabold text-xl sm:text-2xl text-white mb-1">
-                    Elige tu personaje
+                    Ingresa tu cédula
                 </h3>
                 <p class="text-xs text-slate-300 leading-relaxed mb-4 max-w-sm">
-                    Selecciona a tu compañero de agilidad e ingresa tu alias para competir en el Ranking de Invictus.
+                    Consulta tu cédula para recuperar tus resultados. Si es tu primera visita, completa tu nombre y elige tu personaje.
                 </p>
 
+                <div class="w-full text-left mb-4">
+                    <label for="popupCedulaInput" class="block text-[11px] font-bold text-sky-300 mb-2">NÚMERO DE CÉDULA</label>
+                    <div class="flex gap-2">
+                        <input id="popupCedulaInput" type="text" inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15" autocomplete="off" placeholder="Sin puntos ni espacios" class="min-w-0 flex-1 bg-slate-900 border-2 border-slate-700 text-white rounded-xl px-3 py-2 text-sm outline-none focus:border-sky-400">
+                        <button id="btnLookupCedula" type="button" class="px-3 py-2 rounded-xl bg-sky-500 text-slate-950 font-bold text-xs">Consultar</button>
+                    </div>
+                    <p id="cedulaStatus" class="text-xs text-slate-300 mt-2" role="status" aria-live="polite">Ingresa tu cédula y pulsa Consultar.</p>
+                </div>
                 <!-- Avatar Selection (4 Friendly 3D Humans) -->
                 <div class="w-full text-left mb-4">
                     <label class="block font-orbitron font-bold text-[11px] text-sky-300 uppercase tracking-wider mb-2">
@@ -539,7 +547,7 @@
                 </button>
 
                 <p class="text-[10px] text-slate-500 mt-3">
-                    Tu personaje y nombre se guardarán para tus próximas sesiones y records.
+                    Tu historial se recuperará con tu cédula en cada visita.
                 </p>
             </div>
         </div>
@@ -599,6 +607,12 @@
 
             <!-- Modal Body -->
             <div class="p-5 overflow-y-auto flex-1">
+                <p data-save-status class="text-xs text-slate-400 mb-3" role="status" aria-live="polite"></p>
+                <div class="flex gap-2 mb-3">
+                    <button id="btnGlobalRanking" class="px-3 py-2 rounded-lg bg-slate-700 text-white text-xs">Ranking general</button>
+                    <button id="btnPersonalRanking" class="px-3 py-2 rounded-lg bg-sky-600 text-white text-xs">Mis resultados</button>
+                </div>
+                <p id="personalSummary" class="text-xs text-slate-400 mb-3"></p>
                 <div id="rankingListContainer" class="space-y-2">
                     <!-- Populated dynamically -->
                 </div>
@@ -607,7 +621,7 @@
             <!-- Modal Footer -->
             <div class="px-6 py-3.5 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
                 <button id="clearRankingBtn" class="text-xs text-rose-400 hover:text-rose-300 font-semibold transition cursor-pointer flex items-center gap-1.5">
-                    <i class="fas fa-trash-can text-[11px]"></i> Borrar historial
+                    <i class="fas fa-trash-can text-[11px]"></i> Limpiar copia local
                 </button>
                 <button id="closeRankingModalFooterBtn" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition cursor-pointer">
                     Cerrar Ranking
@@ -616,6 +630,9 @@
         </div>
     </div>
 
-    <script src="js/app.js" defer></script>
+    <p data-save-status class="text-center text-xs text-slate-400 py-2" role="status" aria-live="polite"></p>
+    <script src="config.js?v=2" defer></script>
+    <script src="js/storage.js?v=2" defer></script>
+    <script src="js/app.js?v=2" defer></script>
 </body>
 </html>

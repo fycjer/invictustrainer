@@ -392,6 +392,7 @@
 
         let state = {
             playerName: '',
+            playerCedula: '',
             playerAvatar: 'mateo',
             mode: 'campaign', // 'campaign' or 'exam'
             currentLevelIdx: 0,
@@ -541,14 +542,22 @@
             renderAvatarSelectionButtons();
         }
 
+        let checkedCedula = '';
+        let lookupVersion = 0;
+        const cedulaInput = document.getElementById('popupCedulaInput');
+        const cedulaStatus = document.getElementById('cedulaStatus');
         function openOperatorModal() {
+            checkedCedula = '';
+            lookupVersion++;
+            cedulaInput.value = '';
+            cedulaStatus.textContent = 'Ingresa tu cédula y pulsa Consultar.';
             if (operatorModal) {
                 operatorModal.classList.remove('hidden');
                 operatorModal.classList.add('flex');
             }
             if (popupInput) {
-                popupInput.value = state.playerName || '';
-                setTimeout(() => popupInput.focus(), 100);
+                popupInput.value = '';
+                setTimeout(() => cedulaInput.focus(), 100);
             }
             selectAvatar(state.playerAvatar || 'mateo');
         }
@@ -590,6 +599,11 @@
         }
 
         function confirmOperatorRegistration() {
+            if (!checkedCedula || checkedCedula !== cedulaInput.value.trim()) {
+                cedulaStatus.textContent = 'Primero consulta tu cédula.';
+                cedulaInput.focus();
+                return false;
+            }
             const val = popupInput ? popupInput.value.trim() : '';
             if (!val) {
                 if (popupAlert) popupAlert.classList.remove('hidden');
@@ -605,7 +619,10 @@
 
             localStorage.setItem('invictus_current_player', val);
             localStorage.setItem('invictus_current_avatar', tempSelectedAvatar);
+            state.playerCedula = checkedCedula;
             syncOperatorDisplays(val, tempSelectedAvatar);
+            try { window.InvictusStorage.register(checkedCedula, val, tempSelectedAvatar); }
+            catch (error) { console.warn('No se pudo preparar el registro', error); }
             audio.init();
             audio.playGo();
             closeOperatorModal();
@@ -1125,34 +1142,34 @@
         /* ==========================================================================
            5. RANKING / LEADERBOARD LOGIC
            ========================================================================== */
+        let rankingScope = 'global';
         function getRankingData() {
-            try {
-                const stored = localStorage.getItem('invictus_qte_ranking');
-                return stored ? JSON.parse(stored) : [];
-            } catch (e) {
-                return [];
-            }
+            return rankingScope === 'personal' ? window.InvictusStorage.personal().records : window.InvictusStorage.ranking();
         }
 
         function saveScoreToRanking(name, avatar, score, accuracy, grade, mode) {
             if (!name) return;
-            const records = getRankingData();
-            records.push({
-                name: name,
-                avatar: avatar || 'mateo',
-                score: score,
-                accuracy: accuracy,
-                grade: grade,
-                mode: mode === 'campaign' ? 'Campaña (4 Niv)' : 'Examen Libre',
-                date: new Date().toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-            });
+            const avg = state.responseTimes.length
+                ? state.responseTimes.reduce((a, b) => a + b, 0) / state.responseTimes.length : 0;
+            try {
+                window.InvictusStorage.saveResult({
+                    cedula: state.playerCedula, name, avatar: avatar || 'mateo', score, accuracy, grade,
+                    mode: mode === 'campaign' ? 'Campaña (4 Niv)' : 'Examen Libre',
+                    outcome: grade === 'D' ? 'DERROTA' : 'VICTORIA',
+                    level: mode === 'campaign' ? state.currentLevelIdx + 1 : 0,
+                    totalCorrect: state.totalCorrect, totalAttempts: state.totalAttempts,
+                    totalAccuracy: Math.round(state.totalCorrect / (state.totalAttempts || 1) * 100),
+                    avgResponseMs: Math.round(avg),
+                    avgScope: mode === 'campaign' ? 'Último nivel' : 'Examen completo'
+                });
+            } catch (error) {
+                alert('No se pudo guardar la partida en este navegador. Libera espacio y vuelve a intentarlo.');
+                console.error(error);
+            }
+        }
 
-            // Sort by score descending
-            records.sort((a, b) => b.score - a.score);
-
-            // Keep top 20
-            const trimmed = records.slice(0, 20);
-            localStorage.setItem('invictus_qte_ranking', JSON.stringify(trimmed));
+        function escapeRankingText(value) {
+            return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
         function renderRankingList() {
@@ -1161,6 +1178,11 @@
             container.innerHTML = '';
 
             const records = getRankingData();
+            const personal = window.InvictusStorage.personal();
+            const stats = personal.stats;
+            document.getElementById('personalSummary').textContent = rankingScope === 'personal'
+                ? (stats ? `${personal.name}: ${stats.games} partidas guardadas · mejor puntaje ${stats.bestScore} · ${stats.wins} victorias. Historial completo ordenado por puntaje.` : 'Tus resultados sincronizados y pendientes de envío.')
+                : 'Las 20 mejores partidas de todos los jugadores.';
             if (records.length === 0) {
                 container.innerHTML = `
                     <div class="py-8 text-center text-slate-500 text-xs">
@@ -1200,10 +1222,10 @@
                         </div>
                         <div>
                             <div class="font-bold text-[#0b2853] flex items-center gap-2">
-                                <span>${rec.name}</span>
-                                <span class="px-2 py-0.2 rounded-full bg-[#0b2853] text-white font-orbitron font-semibold text-[10px]">${rec.mode}</span>
+                                <span>${escapeRankingText(rec.name)}</span>
+                                <span class="px-2 py-0.2 rounded-full bg-[#0b2853] text-white font-orbitron font-semibold text-[10px]">${escapeRankingText(rec.mode)}</span>
                             </div>
-                            <span class="text-[10px] text-slate-500">${rec.date}</span>
+                            <span class="text-[10px] text-slate-500">${escapeRankingText(rec.date)}</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-4 text-right">
@@ -1455,25 +1477,50 @@
         // Initialize table on boot
         populateGuideTable();
 
-        // Restore saved player name and avatar or require registration popup on entry
-        const savedPlayer = localStorage.getItem('invictus_current_player');
-        const savedAvatar = localStorage.getItem('invictus_current_avatar') || 'mateo';
-        if (savedPlayer) {
-            syncOperatorDisplays(savedPlayer, savedAvatar);
-            closeOperatorModal();
+        // Pedir cédula en cada entrada; no reutilizar una sesión identificada por alias.
+        openOperatorModal();
+        async function lookupCedula() {
+            const cedula = cedulaInput.value.trim();
+            const version = ++lookupVersion;
+            checkedCedula = '';
+            cedulaStatus.textContent = 'Consultando tu historial…';
+            try {
+                const person = await window.InvictusStorage.profile(cedula);
+                if (version !== lookupVersion || cedulaInput.value.trim() !== cedula) return;
+                checkedCedula = cedula;
+                popupInput.value = person.found ? person.name : '';
+                selectAvatar(person.found ? person.avatar : 'mateo');
+                const suffix = person.offline ? ' Sin conexión: los datos se sincronizarán al volver internet.' : '';
+                cedulaStatus.textContent = person.found
+                    ? `Hola, ${person.name}. ${person.stats ? person.stats.games + ' partidas guardadas.' : 'Registro recuperado.'}` + suffix
+                    : 'Cédula nueva: completa tu nombre y elige un personaje.' + suffix;
+                popupInput.focus();
+            } catch (error) {
+                if (version === lookupVersion) cedulaStatus.textContent = 'No se pudo consultar: ' + error.message;
+            }
         }
-        // La identificación del operador se solicita al intentar iniciar una partida,
-        // no al cargar el menú, para permitir primero responder la pregunta de teclas.
+        document.getElementById('btnLookupCedula').addEventListener('click', lookupCedula);
+        cedulaInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); void lookupCedula(); } });
+        cedulaInput.addEventListener('input', () => { checkedCedula = ''; lookupVersion++; cedulaStatus.textContent = 'Pulsa Consultar para recuperar esta cédula.'; });
+        document.getElementById('btnGlobalRanking').addEventListener('click', () => { rankingScope = 'global'; renderRankingList(); void window.InvictusStorage.refresh(); });
+        document.getElementById('btnPersonalRanking').addEventListener('click', () => {
+            rankingScope = 'personal'; renderRankingList();
+            if (state.playerCedula) void window.InvictusStorage.profile(state.playerCedula).catch(error => console.warn(error.message));
+        });
+        window.addEventListener('invictus:profile', renderRankingList);
 
         // Ranking Modal Events
         const rankingModal = document.getElementById('rankingModal');
         document.getElementById('rankingModalBtn').addEventListener('click', () => {
             renderRankingList();
             rankingModal.classList.remove('hidden');
+            void window.InvictusStorage.refresh();
         });
         document.getElementById('closeRankingModalBtn').addEventListener('click', () => rankingModal.classList.add('hidden'));
         document.getElementById('closeRankingModalFooterBtn').addEventListener('click', () => rankingModal.classList.add('hidden'));
         document.getElementById('clearRankingBtn').addEventListener('click', () => {
-            localStorage.removeItem('invictus_qte_ranking');
+            window.InvictusStorage.clearLocalCache();
             renderRankingList();
         });
+
+        window.addEventListener("invictus:ranking", renderRankingList);
