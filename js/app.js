@@ -34,28 +34,28 @@
                 level: 1,
                 title: "Básicas y Navegación",
                 desc: "4 Comandos iniciales de navegación básica.",
-                timeoutMs: 3500,
+                timeoutMs: 4500,
                 keys: [6, 10, 8, 9] // TAB, Flechas, T, C
             },
             {
                 level: 2,
                 title: "Teclas de Función Directas",
                 desc: "5 Comandos mediante teclas de función F1 a F9.",
-                timeoutMs: 3000,
+                timeoutMs: 4000,
                 keys: [15, 16, 2, 3, 4] // F1, F2, F3, F7, F9
             },
             {
                 level: 3,
                 title: "Acciones Avanzadas",
                 desc: "5 Comandos avanzadas de carrito, aleatorios y selección.",
-                timeoutMs: 2500,
+                timeoutMs: 3500,
                 keys: [17, 5, 13, 11, 12] // F10, F11, H, *, -
             },
             {
                 level: 4,
                 title: "Operaciones Críticas",
                 desc: "4 Comandos críticos como pago, salida y borrado.",
-                timeoutMs: 2000,
+                timeoutMs: 3000,
                 keys: [1, 7, 18, 14] // ESC, PageUp, Supr, Ctrl+Enter
             }
         ];
