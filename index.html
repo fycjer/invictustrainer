@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invictus Arcade QTE Trainer - Entrenamiento de Agilidad y Memoria</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+    
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-3 md:p-6 bg-cyber-grid relative overflow-x-hidden">
+
+    <!-- Top Header & Audio Bar -->
+    <header class="w-full max-w-5xl mx-auto flex items-center justify-between bg-slate-900/90 border border-slate-800 backdrop-blur-md px-5 py-3 rounded-2xl mb-4 shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-sky-950 border border-sky-500/50 flex items-center justify-center text-sky-400 font-bold text-xl font-orbitron shrink-0">
+                I
+            </div>
+            <div class="flex flex-col">
+                <h1 class="font-orbitron font-extrabold text-lg text-white tracking-wide leading-tight">
+                    INVICTUS, <span class="text-sky-400 font-medium">Trainer</span>
+                </h1>
+                <p class="text-[11px] text-slate-400 leading-normal mt-0.5">Entrenamiento de Teclas Rápidas del Aplicativo</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button id="headerOperatorBadge" class="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-sky-950/80 hover:bg-sky-900/60 text-sky-300 text-xs font-semibold border border-sky-500/40 transition cursor-pointer" title="Cambiar Operador">
+                <div id="headerOperatorAvatarSlot" class="w-6 h-6 rounded-full overflow-hidden shrink-0"></div>
+                <span id="headerOperatorName">Operador</span>
+                <i class="fas fa-pen text-[10px] text-slate-400 ml-0.5"></i>
+            </button>
+            <button id="guideModalBtn" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold tracking-wider transition border border-slate-700 flex items-center gap-2 cursor-pointer">
+                <i class="fas fa-keyboard text-sky-400"></i> <span class="hidden md:inline">Tabla de Teclas</span> (18)
+            </button>
+            <button id="rankingModalBtn" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold tracking-wider transition border border-amber-500/40 flex items-center gap-2 cursor-pointer">
+                <i class="fas fa-trophy text-amber-400"></i> Ranking
+            </button>
+            <button id="soundToggleBtn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition border border-slate-700 flex items-center gap-2 cursor-pointer">
+                <i id="soundIcon" class="fas fa-volume-up text-sky-400"></i>
+                <span id="soundLabel" class="hidden sm:inline">Audio ON</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Game Viewport -->
+    <main id="appContainer" class="w-full max-w-5xl mx-auto flex-1 bg-slate-900/95 border-2 border-slate-800/90 rounded-3xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-md relative">
+        
+        <!-- Top HUD (Visible during gameplay) -->
+        <div id="hudPanel" class="hidden bg-slate-950/90 border-b border-slate-800 px-6 py-3 flex-wrap items-center justify-between gap-4 z-20">
+            <!-- Mode & Stage -->
+            <div class="flex items-center gap-3">
+                <button id="btnHudBack" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Regresar al Menú Principal">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Atrás</span>
+                </button>
+                <div class="px-3 py-1 rounded-full bg-sky-950 border border-sky-500/30 text-sky-400 text-xs font-bold tracking-widest uppercase" id="hudModeTag">
+                    NIVEL 1
+                </div>
+                <div class="flex flex-col">
+                    <div id="hudLevelTitle" class="font-orbitron font-bold text-sm text-slate-200 leading-tight">
+                        Básicas y Navegación
+                    </div>
+                    <div class="text-[11px] text-sky-400 font-semibold flex items-center gap-1.5">
+                        <div id="hudPlayerAvatarSlot" class="w-5 h-5 rounded-full overflow-hidden shrink-0"></div>
+                        <span id="hudPlayerDisplay">Operador</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Hearts -->
+            <div class="flex items-center gap-2">
+                <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mr-1">VIDAS:</span>
+                <div id="hudHearts" class="flex gap-1.5">
+                    <!-- Dynamic Hearts -->
+                </div>
+            </div>
+
+            <!-- Combo & Score -->
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">COMBO</div>
+                    <div id="hudCombo" class="font-orbitron font-bold text-lg text-amber-400">x0</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">PUNTAJE</div>
+                    <div id="hudScore" class="font-orbitron font-black text-2xl text-white">0000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Game Screens Container -->
+        <div class="flex-1 flex items-center justify-center p-4 md:p-8 relative min-h-[480px]">
+
+            <!-- SCREEN 1: MAIN MENU / MODE SELECTION -->
+            <section id="screenMenu" class="w-full max-w-4xl flex flex-col items-center py-2 max-h-[75vh] overflow-y-auto pr-1">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-950/80 border border-sky-500/40 text-sky-400 text-xs font-bold tracking-widest uppercase mb-3 shadow-lg">
+                    <i class="fas fa-shield-halved"></i> Simulador Oficial Invictus
+                </div>
+
+                <h2 class="font-orbitron font-black text-3xl sm:text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-200 to-indigo-400 mb-2 tracking-tight neon-blue text-center">
+                    INVICTUS, TRAINER
+                </h2>
+                
+                <p class="max-w-xl text-slate-300 text-xs md:text-sm mb-5 leading-relaxed text-center">
+                    Repasa las <strong class="text-sky-400 font-bold">18 teclas rápidas</strong> del sistema a continuación. Una vez bajes por la pantalla podrás seleccionar el modo de juego e iniciar.
+                </p>
+
+                <!-- SECTION A: 18 HOTKEYS OVERVIEW -->
+                <div class="w-full bg-slate-950/90 border border-slate-800 rounded-2xl p-4 sm:p-5 mb-6 shadow-inner">
+                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
+                            <h3 class="font-orbitron font-bold text-sm sm:text-base text-white">
+                                Paso 1: Teclas Rápidas del Aplicativo
+                            </h3>
+                        </div>
+                        <span class="text-[11px] font-bold text-sky-400 bg-sky-950/80 px-2.5 py-1 rounded-md border border-sky-800/60">
+                            18 Comandos
+                        </span>
+                    </div>
+
+                    <!-- 18 Keys Direct Display Grid -->
+                    <div id="mainScreenKeysGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <!-- Scroll Hint Banner -->
+                    <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-center gap-2 text-sky-400 text-xs font-semibold animate-bounce">
+                        <i class="fas fa-angles-down"></i>
+                        <span>Baja aquí para desbloquear y comenzar la partida</span>
+                        <i class="fas fa-angles-down"></i>
+                    </div>
+                </div>
+
+                <!-- SECTION B: GAME LAUNCH CONTROLS (UNLOCKED UPON SCROLLING DOWN) -->
+                <div id="gamePlaySection" class="w-full bg-gradient-to-b from-slate-900/90 to-slate-950 border-2 border-sky-500/40 rounded-2xl p-5 sm:p-6 shadow-2xl relative">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-gamepad text-sky-400 text-lg"></i>
+                            <h3 class="font-orbitron font-bold text-base text-white">
+                                Paso 2: Selección de Modo de Juego
+                            </h3>
+                        </div>
+                        <span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-0.5 rounded-full">
+                            <i class="fas fa-unlock text-[10px] mr-1"></i> Listo para Jugar
+                        </span>
+                    </div>
+
+                    <!-- Active Operator Banner -->
+                    <div class="w-full bg-slate-950/90 border border-slate-800 rounded-2xl p-3.5 mb-5 shadow-inner flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div id="activeAvatarBox" class="w-12 h-12 rounded-2xl bg-sky-950 border border-sky-500/40 flex items-center justify-center overflow-hidden transition shadow-md shrink-0">
+                                <!-- Dynamic 3D Human Avatar -->
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Operador Registrado:</span>
+                                <div class="flex items-center gap-2">
+                                    <span id="activePlayerDisplay" class="font-orbitron font-bold text-base text-sky-300">Operador</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="btnChangeOperator" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fas fa-user-pen text-sky-400"></i> Cambiar Personaje
+                        </button>
+                    </div>
+
+                    <!-- Game Mode Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-4">
+                        <!-- Campaign Mode -->
+                        <div class="bg-slate-950/80 border border-slate-800 hover:border-sky-500/60 p-5 rounded-2xl text-left transition group relative flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-sky-400">Modo Historia</span>
+                                    <i class="fas fa-layer-group text-sky-400 text-lg group-hover:scale-110 transition"></i>
+                                </div>
+                                <h4 class="font-orbitron font-bold text-base text-white mb-1.5">Entrenamiento por Niveles</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                                    Avanza progresivamente por 4 niveles catalogados por dificultad con tiempos de respuesta desde 3.5s hasta 2.0s.
+                                </p>
+                            </div>
+                            <button id="btnStartCampaign" class="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-orbitron font-bold text-sm tracking-wider transition shadow-lg shadow-sky-500/20 cursor-pointer">
+                                INICIAR CAMPAÑA (4 NIVELES)
+                            </button>
+                        </div>
+
+                        <!-- Free Exam Mode -->
+                        <div class="bg-slate-950/80 border border-slate-800 hover:border-indigo-500/60 p-5 rounded-2xl text-left transition group relative flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Modo Examen</span>
+                                    <i class="fas fa-bolt text-indigo-400 text-lg group-hover:scale-110 transition"></i>
+                                </div>
+                                <h4 class="font-orbitron font-bold text-base text-white mb-1.5">Desafío Aleatorio (18 Teclas)</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                                    Ponte a prueba con todos los 18 comandos en orden aleatorio a alta velocidad (2.2s por tecla).
+                                </p>
+                            </div>
+                            <button id="btnStartExam" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-orbitron font-bold text-sm tracking-wider transition shadow-lg shadow-indigo-500/20 cursor-pointer">
+                                INICIAR EXAMEN LIBRE
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 flex items-center justify-center gap-2">
+                        <i class="fas fa-shield text-sky-400"></i> Las teclas especiales (F1, F2, F3, F7, F9, F10, F11, Tab, PageUp, Supr, Ctrl+Enter) están bloqueadas contra eventos externos del navegador.
+                    </div>
+                </div>
+            </section>
+
+            <!-- SCREEN 2: LEVEL BRIEFING / COUNTDOWN -->
+            <section id="screenBriefing" class="hidden w-full max-w-lg flex-col items-center justify-center text-center py-6">
+                <div id="briefingBadge" class="text-xs font-bold uppercase tracking-widest text-sky-400 mb-2">STAGE 1 DE 4</div>
+                <h3 id="briefingTitle" class="font-orbitron font-black text-3xl md:text-4xl text-white mb-2">Nivel 1: Básicas y Navegación</h3>
+                <p id="briefingDesc" class="text-slate-400 text-sm mb-6">4 Comandos - Ventana de tiempo: 3.5 segundos</p>
+
+                <!-- List of Keys in this level -->
+                <div id="briefingKeysList" class="w-full bg-slate-950/70 border border-slate-800 rounded-2xl p-4 mb-8 text-left space-y-2 text-xs">
+                    <!-- Dynamic level preview -->
+                </div>
+
+                <!-- Passing Requirement Badge -->
+                <div class="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950/70 border border-amber-500/40 text-amber-300 text-xs font-semibold">
+                    <i class="fas fa-bullseye"></i> Requisito para avanzar: Mínimo 75% de precisión
+                </div>
+
+                <!-- Countdown Ring -->
+                <div class="relative flex items-center justify-center w-28 h-28 mb-4">
+                    <div class="absolute inset-0 rounded-full border-4 border-sky-500/20 animate-ping"></div>
+                    <div id="countdownText" class="font-orbitron font-black text-5xl text-sky-400 neon-blue">3</div>
+                </div>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">¡PREPÁRATE PARA PRESIONAR!</div>
+                
+                <button id="btnBriefingBack" class="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center gap-2 cursor-pointer">
+                    <i class="fas fa-arrow-left"></i> Cancelar y Regresar Atrás
+                </button>
+            </section>
+
+            <!-- SCREEN 3: ACTIVE GAMEPLAY -->
+            <section id="screenGameplay" class="hidden w-full flex-col items-center justify-center relative my-2">
+                
+                <!-- Prompt Progress Counter -->
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-950 border border-slate-800 px-4 py-1 rounded-full text-xs font-semibold text-slate-400 flex items-center gap-2">
+                    <span id="promptModeBadge">ACCIÓN OBJETIVO</span>
+                    <span id="promptIndexText" class="text-sky-400 font-orbitron font-bold">1 / 4</span>
+                </div>
+
+                <!-- Floating Rating Popups Anchor -->
+                <div id="ratingAnchor" class="absolute top-2 left-1/2 -translate-x-1/2 pointer-events-none z-30 h-10 flex items-center justify-center"></div>
+
+                <!-- Central Circular Timer & Key Prompt Display -->
+                <div class="relative flex items-center justify-center my-4">
+                    
+                    <!-- SVG Circular Progress Timer -->
+                    <svg class="timer-ring w-72 h-72 sm:w-80 sm:h-80">
+                        <circle class="text-slate-800/80" stroke-width="10" stroke="currentColor" fill="transparent" r="80" cx="50%" cy="50%" />
+                        <circle id="timerCircle" class="timer-circle text-sky-400" stroke-width="10" stroke-dasharray="502" stroke-linecap="round" stroke="currentColor" fill="transparent" r="80" cx="50%" cy="50%" />
+                    </svg>
+
+                    <!-- Key Prompt Card -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-4">
+                        
+                        <!-- Reference Number Badge -->
+                        <div id="promptRefNum" class="text-[11px] font-bold text-sky-400 uppercase bg-slate-950/90 px-3 py-1 rounded-full border border-sky-500/30 mb-2">
+                            PISTA / ACCIÓN
+                        </div>
+
+                        <!-- Main Action Display (The Clue) -->
+                        <div id="promptActionText" class="text-lg sm:text-xl font-bold text-white text-center max-w-[240px] leading-tight my-2">
+                            Ir al campo siguiente
+                        </div>
+
+                        <!-- Friendly Key Action Prompt -->
+                        <div id="promptKeyDisplay" class="bg-gradient-to-r from-sky-950/90 to-slate-900/90 px-5 py-2.5 rounded-2xl border border-sky-500/40 text-sm font-bold text-sky-300 mt-2 flex items-center gap-2.5 shadow-lg shadow-sky-950/50">
+                            <span class="w-7 h-7 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300">
+                                <i class="fas fa-hand-pointer text-xs animate-bounce"></i>
+                            </span>
+                            <span id="promptKeySecretText" class="tracking-wide text-xs sm:text-sm font-semibold">¡Presiona tu tecla!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Hint -->
+                <div class="bg-slate-950/60 border border-slate-800 px-4 py-2 rounded-xl text-xs text-slate-400 flex items-center gap-2 mt-2">
+                    <i class="fas fa-lightbulb text-amber-400"></i>
+                    <span>Recuerda la tecla asociada a esta función y presiónala en tu teclado antes de que se agote el tiempo.</span>
+                </div>
+            </section>
+
+            <!-- SCREEN 4: LEVEL CLEARED / STAGE INTERMISSION -->
+            <section id="screenLevelClear" class="hidden w-full max-w-xl flex-col items-center justify-center text-center py-4">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-950 border border-emerald-500/50 text-emerald-400 flex items-center justify-center text-2xl mb-2 shadow-lg shadow-emerald-500/20">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+
+                <h3 class="font-orbitron font-black text-2xl sm:text-3xl text-white mb-0.5">¡NIVEL COMPLETADO!</h3>
+                <p id="levelClearSub" class="text-slate-400 text-xs mb-4">Demostraste excelente velocidad de respuesta.</p>
+
+                <!-- Stage Metrics Box -->
+                <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3 sm:p-4 w-full mb-4 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Comandos Completados:</span>
+                        <span id="statLevelCount" class="font-orbitron font-bold text-sky-400">4 / 4</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Tiempo Promedio de Respuesta:</span>
+                        <span id="statLevelAvgTime" class="font-orbitron font-bold text-amber-400">0.48s</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Precisión del Nivel:</span>
+                        <span id="statLevelAccuracy" class="font-orbitron font-bold text-emerald-400">100%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs border-t border-slate-800 pt-2">
+                        <span class="text-slate-400">Bonificación de Puntos:</span>
+                        <span id="statLevelBonus" class="font-orbitron font-bold text-white">+1,500</span>
+                    </div>
+                </div>
+
+                <!-- Detailed Level Feedback (Aciertos y Errores) -->
+                <div class="w-full bg-slate-950/90 border border-slate-800 rounded-2xl p-3 mb-5 text-left">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-pie text-sky-400 text-xs"></i>
+                            <span class="font-orbitron font-bold text-xs text-slate-200">Retroalimentación del Nivel</span>
+                        </div>
+                        <div class="flex gap-2 text-[10px] font-bold">
+                            <span id="feedbackSuccessCountBadge" class="px-2 py-0.5 rounded bg-emerald-950/90 border border-emerald-500/40 text-emerald-400">0 Aciertos</span>
+                            <span id="feedbackErrorsCountBadge" class="px-2 py-0.5 rounded bg-rose-950/90 border border-rose-500/40 text-rose-400">0 Errores</span>
+                        </div>
+                    </div>
+                    <div id="levelFeedbackList" class="max-h-40 overflow-y-auto pr-1 space-y-1.5 text-xs">
+                        <!-- Dynamic items generated by script -->
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 w-full">
+                    <button id="btnReturnMenuFromClear" class="sm:w-1/3 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-orbitron font-bold text-xs tracking-wider transition border border-slate-700 flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-arrow-left"></i> MENÚ
+                    </button>
+                    <button id="btnNextLevel" class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-orbitron font-bold text-sm tracking-wider transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer">
+                        CONTINUAR AL SIGUIENTE NIVEL <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- SCREEN 5: GAME OVER / FAIL -->
+            <section id="screenGameOver" class="hidden w-full max-w-xl flex-col items-center justify-center text-center py-4">
+                <div class="w-14 h-14 rounded-2xl bg-rose-950 border border-rose-500/50 text-rose-400 flex items-center justify-center text-2xl mb-2 shadow-lg shadow-rose-500/20">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+
+                <h3 id="gameOverTitle" class="font-orbitron font-black text-2xl text-rose-500 mb-0.5">¡HAS PERDIDO EL JUEGO!</h3>
+                <p id="gameOverReason" class="text-slate-300 text-xs mb-4 leading-relaxed">No alcanzaste la precisión mínima (75%) para pasar al siguiente nivel.</p>
+
+                <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 w-full mb-3 text-left text-xs divide-y divide-slate-800">
+                    <div class="flex justify-between items-center py-1.5">
+                        <span class="text-slate-400">Precisión alcanzada:</span>
+                        <span id="gameOverAccuracy" class="font-orbitron font-bold text-rose-400 text-sm">50%</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5">
+                        <span class="text-slate-400">Mínimo para pasar:</span>
+                        <span class="font-orbitron font-bold text-emerald-400 text-sm">75%</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-slate-400">Puntaje acumulado:</span>
+                        <span id="gameOverScore" class="font-orbitron font-black text-white text-base">0000</span>
+                    </div>
+                </div>
+
+                <!-- Feedback in Game Over Screen -->
+                <div class="w-full bg-slate-950/90 border border-slate-800 rounded-2xl p-3 mb-4 text-left">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+                        <span class="font-orbitron font-bold text-xs text-rose-400">Revisión de Errores y Aciertos:</span>
+                    </div>
+                    <div id="gameOverFeedbackList" class="max-h-36 overflow-y-auto pr-1 space-y-1.5 text-xs">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="flex gap-3 w-full">
+                    <button id="btnRetryGame" class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-400 hover:to-pink-500 text-white font-orbitron font-bold text-xs tracking-wider transition cursor-pointer">
+                        <i class="fas fa-rotate-right mr-1"></i> REINTENTAR
+                    </button>
+                    <button id="btnReturnMenuFromFail" class="flex-1 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-orbitron font-bold text-xs tracking-wider transition border border-slate-700 cursor-pointer">
+                        MENÚ PRINCIPAL
+                    </button>
+                </div>
+            </section>
+
+            <!-- SCREEN 6: VICTORY / GRADUATION -->
+            <section id="screenVictory" class="hidden w-full max-w-lg flex-col items-center justify-center text-center py-6">
+                <div class="w-20 h-20 rounded-3xl bg-amber-950/80 border border-amber-500/50 text-amber-400 flex items-center justify-center text-4xl mb-4 shadow-xl shadow-amber-500/20">
+                    <i class="fas fa-trophy"></i>
+                </div>
+
+                <h3 class="font-orbitron font-black text-3xl sm:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 mb-2">
+                    ¡AGILIDAD INVICTUS CERTIFICADA!
+                </h3>
+                <p class="text-slate-300 text-xs sm:text-sm max-w-md mb-6">
+                    Has dominado satisfactoriamente la secuencia de teclas rápidas del sistema.
+                </p>
+
+                <!-- Final Stats Card -->
+                <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-5 w-full mb-6 flex items-center justify-between gap-4">
+                    <div class="text-center flex-1">
+                        <div class="text-[11px] text-slate-400 mb-1">RANGO DE AGILIDAD</div>
+                        <div id="finalRankGrade" class="font-orbitron font-black text-5xl text-amber-400 neon-blue">S</div>
+                    </div>
+                    <div class="w-px h-14 bg-slate-800"></div>
+                    <div class="text-left flex-1 space-y-1 text-xs">
+                        <div>
+                            <span class="text-slate-400">Puntaje Total:</span>
+                            <span id="finalTotalScore" class="font-orbitron font-bold text-white block text-sm">18,500</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400">Precisión Global:</span>
+                            <span id="finalAccuracy" class="font-orbitron font-bold text-emerald-400 block text-sm">96%</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400">Reacción Promedio:</span>
+                            <span id="finalAvgTime" class="font-orbitron font-bold text-sky-400 block text-sm">0.38s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btnReturnMenuFromWin" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-orbitron font-bold text-sm tracking-wider transition shadow-lg shadow-sky-500/25 cursor-pointer">
+                    VOLVER AL MENÚ PRINCIPAL
+                </button>
+            </section>
+
+        </div>
+
+        <!-- Footer System Status -->
+        <div class="bg-slate-950/90 border-t border-slate-800 px-6 py-2.5 flex items-center justify-between text-[11px] text-slate-500">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>TECLAS CARGADAS: 18 / 18</span>
+            </div>
+            <div>INVICTUS BUSINESS SUITE QTE</div>
+        </div>
+    </main>
+
+    <!-- MANDATORY POPUP: REGISTRO PREVIO DEL OPERADOR -->
+    <div id="operatorRegistrationModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-sky-500/60 rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+            <!-- Ambient Glow -->
+            <div class="absolute -top-16 -right-16 w-36 h-36 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col items-center text-center">
+                <!-- Selected 3D Human Avatar Big Preview -->
+                <div id="popupAvatarPreviewBox" class="w-20 h-20 rounded-3xl bg-slate-950 border-2 border-sky-400/80 flex items-center justify-center mb-3 shadow-xl shadow-sky-500/30 transition overflow-hidden">
+                    <!-- Dynamic preview SVG -->
+                </div>
+
+                <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-sky-950 border border-sky-500/30 text-sky-400 text-[10px] font-bold tracking-widest uppercase mb-1.5">
+                    IDENTIFICACIÓN DE OPERADOR
+                </div>
+
+                <h3 class="font-orbitron font-extrabold text-xl sm:text-2xl text-white mb-1">
+                    Elige tu personaje
+                </h3>
+                <p class="text-xs text-slate-300 leading-relaxed mb-4 max-w-sm">
+                    Selecciona a tu compañero de agilidad e ingresa tu alias para competir en el Ranking de Invictus.
+                </p>
+
+                <!-- Avatar Selection (4 Friendly 3D Humans) -->
+                <div class="w-full text-left mb-4">
+                    <label class="block font-orbitron font-bold text-[11px] text-sky-300 uppercase tracking-wider mb-2">
+                        Personajes Disponibles:
+                    </label>
+                    <div id="avatarOptionsGrid" class="grid grid-cols-4 gap-2.5">
+                        <!-- Populated dynamically via JS with friendly 3D human illustrations -->
+                    </div>
+                </div>
+
+                <!-- Input Box -->
+                <div class="w-full text-left mb-4">
+                    <label for="popupPlayerNameInput" class="block font-orbitron font-bold text-[11px] text-sky-300 uppercase tracking-wider mb-1.5">
+                        Nombre / Alias del Jugador <span class="text-rose-400">*</span>
+                    </label>
+                    <div class="relative flex items-center">
+                        <div class="absolute left-3.5 text-slate-500 pointer-events-none">
+                            <i class="fas fa-id-card-clip text-sm"></i>
+                        </div>
+                        <input 
+                            id="popupPlayerNameInput" 
+                            type="text" 
+                            maxlength="20" 
+                            autocomplete="off"
+                            placeholder="Ej: Luchin / Operador01" 
+                            class="w-full bg-slate-900 border-2 border-slate-700 focus:border-sky-400 focus:ring-2 focus:ring-sky-500/40 text-white rounded-xl py-2.5 pl-10 pr-4 text-sm font-semibold tracking-wide placeholder-slate-500 transition outline-none"
+                        />
+                    </div>
+                    <p id="popupNameAlert" class="hidden text-rose-400 text-xs font-semibold mt-2 flex items-center gap-1.5">
+                        <i class="fas fa-circle-exclamation"></i> Por favor ingresa un nombre para continuar.
+                    </p>
+                </div>
+
+                <!-- Submit Button -->
+                <button id="btnConfirmOperator" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-400 hover:to-blue-400 text-slate-950 font-orbitron font-bold text-sm tracking-wider transition shadow-lg shadow-sky-500/30 flex items-center justify-center gap-2 cursor-pointer">
+                    <span>INGRESAR AL SISTEMA</span>
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </button>
+
+                <p class="text-[10px] text-slate-500 mt-3">
+                    Tu personaje y nombre se guardarán para tus próximas sesiones y records.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: 18 HOTKEYS CHEAT SHEET GUIDE TABLE -->
+    <div id="guideModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-slate-800 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-keyboard text-sky-400 text-xl"></i>
+                    <h3 class="font-orbitron font-bold text-lg text-white">Tabla de Teclas Rápidas Aplicativo Invictus (18 Comandos)</h3>
+                </div>
+                <button id="closeGuideModalBtn" class="text-slate-400 hover:text-white text-xl p-1 transition cursor-pointer">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body / Table -->
+            <div class="p-6 overflow-y-auto flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <!-- Cards for each 18 keys -->
+                    <div id="guideKeysContainer" class="col-span-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                        <!-- Dynamic Key Item Cards -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-3 bg-slate-950 border-t border-slate-800 flex justify-end">
+                <button id="closeGuideModalFooterBtn" class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs transition cursor-pointer">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: RANKING / TABLA DE POSICIONES -->
+    <div id="rankingModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-amber-500/40 rounded-3xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-950 border border-amber-500/50 flex items-center justify-center text-amber-400 text-base">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-orbitron font-bold text-base sm:text-lg text-white">Ranking de Operadores Invictus</h3>
+                        <p class="text-[11px] text-slate-400">Cuadro de honor de agilidad y precisión</p>
+                    </div>
+                </div>
+                <button id="closeRankingModalBtn" class="text-slate-400 hover:text-white text-xl p-1 transition cursor-pointer">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-5 overflow-y-auto flex-1">
+                <div id="rankingListContainer" class="space-y-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-3.5 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
+                <button id="clearRankingBtn" class="text-xs text-rose-400 hover:text-rose-300 font-semibold transition cursor-pointer flex items-center gap-1.5">
+                    <i class="fas fa-trash-can text-[11px]"></i> Borrar historial
+                </button>
+                <button id="closeRankingModalFooterBtn" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition cursor-pointer">
+                    Cerrar Ranking
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js" defer></script>
+</body>
+</html>
